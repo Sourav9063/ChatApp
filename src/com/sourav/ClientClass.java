@@ -14,23 +14,26 @@ public class ClientClass {
         System.out.println("Enter your name: ");
         userName = scanner.nextLine();
         System.out.println("Client Class");
-        Socket socket = null;
+
         try {
             NetworkHelper networkHelper = new NetworkHelper("127.0.0.1", 1234);
             System.out.println("Connected to server");
             networkHelper.write(userName);
             Object response = networkHelper.read();
-            System.out.println("Your user name is: "+response.toString());
+            System.out.println("Your user name is: " + response.toString());
 
             new Thread(new WriterThread(networkHelper)).start();
             new Thread(new ReaderThread(networkHelper)).start();
-        }  catch (IOException e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
+//        scanner.close();
     }
 }
-class ReaderThread implements Runnable{
+
+class ReaderThread implements Runnable {
     NetworkHelper networkHelper;
+
     public ReaderThread(NetworkHelper networkHelper) {
         this.networkHelper = networkHelper;
     }
@@ -40,7 +43,8 @@ class ReaderThread implements Runnable{
         while (true) {
             try {
                 Object returnMsg = networkHelper.ois.readObject();
-                if(returnMsg==null)break;
+                if (returnMsg == null)
+                    break;
                 System.out.println("Server response:\n" + returnMsg);
 
             } catch (IOException e) {
@@ -54,10 +58,12 @@ class ReaderThread implements Runnable{
         }
     }
 }
-class WriterThread implements Runnable{
+
+class WriterThread implements Runnable {
     NetworkHelper networkHelper;
-    public WriterThread(NetworkHelper networkHelper){
-      this.networkHelper=networkHelper;
+
+    public WriterThread(NetworkHelper networkHelper) {
+        this.networkHelper = networkHelper;
     }
 
     @Override
@@ -65,14 +71,18 @@ class WriterThread implements Runnable{
         Scanner scanner = new Scanner(System.in);
         while (true) {
             String message = scanner.nextLine();
-            if(message.equals("exit")){
+            if (message.equals("exit")) {
                 networkHelper.write(null);
-                break;}
-            try {
-                networkHelper.oos.writeObject(message);
-            } catch (IOException e) {
-                e.printStackTrace();
                 break;
+            }
+            if(message.contains("Send File:")){
+                networkHelper.write(message);
+                FilesToByte.SendFile("Files/Received/File2.txt",networkHelper);
+            }
+            try {
+                networkHelper.write(message);
+            }finally {
+
             }
         }
         try {
@@ -80,6 +90,6 @@ class WriterThread implements Runnable{
         } catch (IOException e) {
             e.printStackTrace();
         }
-
+//        scanner.close();
     }
 }

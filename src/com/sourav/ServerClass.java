@@ -71,6 +71,9 @@ class ServerThreadClass implements Runnable {
                 userList.get(to).write(currentUser+":"+message);
 
             }
+            if(object.toString().contains("Send File")){
+                FilesToByte.receiveFile("Files/Received/File1.txt",networkHelper);
+            }
 
 
         }
