@@ -22,7 +22,7 @@ public class ClientClass {
             Object response = networkHelper.read();
             System.out.println("Your user name is: " + response.toString());
 
-            new Thread(new WriterThread(networkHelper)).start();
+            new Thread(new WriterThread(response.toString(),networkHelper)).start();
             new Thread(new ReaderThread(networkHelper)).start();
         } catch (IOException e) {
             e.printStackTrace();
@@ -61,8 +61,11 @@ class ReaderThread implements Runnable {
 
 class WriterThread implements Runnable {
     NetworkHelper networkHelper;
+    String currentUser;
 
-    public WriterThread(NetworkHelper networkHelper) {
+    public WriterThread(String currentUser, NetworkHelper networkHelper) {
+
+        this.currentUser = currentUser;
         this.networkHelper = networkHelper;
     }
 
@@ -76,8 +79,10 @@ class WriterThread implements Runnable {
                 break;
             }
             if(message.contains("Send File:")){
+                String[] split = message.toString().split(":");
+                String to = split[1];
                 networkHelper.write(message);
-                FilesToByte.SendFile("Files/Received/File2.txt",networkHelper);
+                FilesToByte.SendFile("Files/Received/"+currentUser+"File2.txt",networkHelper);
             }
             try {
                 networkHelper.write(message);
