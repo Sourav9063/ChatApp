@@ -25,7 +25,7 @@ public class FilesToByte {
             File file = new File(filePath);
 
             FileInputStream fis = new FileInputStream(filePath);
-            byte[] fileBytes = new byte[(int) file.length()];
+            byte[] fileBytes = new byte[1024];
             BufferedInputStream bis = new BufferedInputStream(fis);
             bis.read(fileBytes, 0, fileBytes.length);
 
@@ -54,14 +54,20 @@ public class FilesToByte {
             bos = new BufferedOutputStream(fos);
             bytesRead = is.read(mybytearray, 0, mybytearray.length);
             current = bytesRead;
+            for(int i = 0; i < mybytearray.length; i++) {
+                System.out.println(mybytearray[i]);
+            }
 
-            do {
-                bytesRead = is.read(mybytearray, current, (mybytearray.length - current));
-                if (bytesRead >= 0)
-                    current += bytesRead;
-            } while (bytesRead > -1);
-
-            bos.flush();
+//            do {
+//                bytesRead = is.read(mybytearray, current, (mybytearray.length - current));
+//                if (bytesRead >= 0)
+//                    current += bytesRead;
+////                System.out.println("Receiving...");
+////                System.out.println(bytesRead);
+//
+//            } while (bytesRead >= -1);
+bos.write(mybytearray, 0, current);
+//            bos.flush();
             System.out.println("File " + filePath
                     + " downloaded (" + current + " bytes read)");
         } catch (IOException e) {
