@@ -24,7 +24,7 @@ public class ServerClass {
                 System.out.println("Connected User Name : " + connectedUserName);
                 userList.put(userName, networkHelper);
 
-                networkHelper.write(userName);
+                networkHelper.write(userName+"\n\"List?\" for list of users"+"\n\"Exit\" to exit"+"\n\"To:sender username:your message\" to send message");
                 new ServerThreadClass(userName,networkHelper,userList);
             }
         } catch (IOException e) {
@@ -72,6 +72,7 @@ class ServerThreadClass implements Runnable {
 
             }
             if(object.toString().contains("Send File")){
+
                 FilesToByte.receiveFile("Files/Received/File1.txt",networkHelper);
             }
 

@@ -95,3 +95,4 @@ bos.write(mybytearray, 0, current);
     }
 
 }
+
