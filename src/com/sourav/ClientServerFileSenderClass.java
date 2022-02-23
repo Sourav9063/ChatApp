@@ -38,7 +38,7 @@ public class ClientServerFileSenderClass implements Runnable {
                 }
 
             }
-            closeConnection();
+//            closeConnection();
 
         }
         catch (Exception e){

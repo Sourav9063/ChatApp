@@ -18,9 +18,11 @@ public class ClientFileReceiveClass implements   Runnable{
             InputStream inputStream = networkHelper.socket.getInputStream();
             BufferedInputStream bufferedInputStream = new BufferedInputStream(inputStream);
             int code = bufferedInputStream.read();
+            System.out.println("code is "+code);
             if(code==1){
-                BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(new FileOutputStream(receiveLocation));
-                                byte[] buffer = new byte[1024];
+                File file= new File(receiveLocation);
+                BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(new FileOutputStream(file));
+                byte[] buffer = new byte[1024];
                 int bytesRead = 0;
                 while ((bytesRead = bufferedInputStream.read(buffer)) != -1) {
                     bufferedOutputStream.write(buffer, 0, bytesRead);

@@ -71,10 +71,23 @@ class ServerThreadClass implements Runnable {
                 userList.get(to).write(currentUser+":"+message);
 
             }
-            if(object.toString().contains("Send File")){
+            if(object.toString().contains("Send File:")){
+                System.out.println("Send****************************************************Called");
+                String[] split = object.toString().split(":");
+               for(String s:split){
+                   System.out.println(s);
+               }
 
-                FilesToByte.receiveFile("Files/Received/File1.txt",networkHelper);
+                String name = split[1];
+             ClientFileReceiveClass receiveClass=   new ClientFileReceiveClass(networkHelper,"E:\\Books\\Books study 3.1\\Distributive System\\Assaignment\\ChatApp\\Files\\Temp\\"+name);
+
+                networkHelper.write("File Received at Server");
+
+                System.out.println("Done");
+
+
             }
+
 
 
         }

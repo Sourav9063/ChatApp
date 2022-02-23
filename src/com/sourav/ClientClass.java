@@ -75,15 +75,24 @@ class WriterThread implements Runnable {
                 networkHelper.write(null);
                 break;
             }
-            if(message.contains("Send File:")){
-                networkHelper.write(message);
-                FilesToByte.SendFile("Files/Received/File2.txt",networkHelper);
-            }
-            try {
-                networkHelper.write(message);
-            }finally {
+          else if(message.contains("Send File:")){
+//                E:\\Books\\Books study 3.1\\Distributive System\\Assaignment\\ChatApp\\Files\\Received\\File2.txt
+                System.out.println("Input Location");
+                String location = scanner.nextLine();
+                System.out.println("Input File Name");
+                String fileName = scanner.nextLine();
+
+                System.out.println("Send To?");
+                String sendTo = scanner.nextLine();
+
+                new ClientServerFileSenderClass(networkHelper,location);
+                networkHelper.write("Send File:"+fileName);
 
             }
+            else {
+                networkHelper.write(message);
+            }
+
         }
         try {
             networkHelper.socket.close();
