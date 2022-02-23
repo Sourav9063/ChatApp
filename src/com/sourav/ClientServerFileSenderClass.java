@@ -24,21 +24,28 @@ public class ClientServerFileSenderClass implements Runnable {
             bufferedOutputStream=new BufferedOutputStream(networkHelper.getSocket().getOutputStream());
             File file=new File(fileName);
             if(!file.exists()){
-                System.out.println("File not found");
-                bufferedOutputStream.write((byte) 0);
+                System.out.println("File not found sender");
+//                bufferedOutputStream.write((byte) 0);
             }
             else{
-                bufferedOutputStream.write((byte) 1);
+                int fileSize= (int) file.length();
+//                bufferedOutputStream.write((byte) 1);
                 bufferedInputStream = new BufferedInputStream(new FileInputStream(file));
+                networkHelper.write(fileSize);
                 byte[] buffer = new byte[1024];
                 int bytesRead=0;
                 while ((bytesRead = bufferedInputStream.read(buffer)) != -1) {
+                    System.out.println("Bytes read: " + bytesRead);
                     bufferedOutputStream.write(buffer, 0, bytesRead);
                     bufferedOutputStream.flush();
                 }
-
+                System.out.println(bytesRead);
             }
-//            closeConnection();
+
+
+            System.out.println("File sent");
+
+
 
         }
         catch (Exception e){
@@ -47,13 +54,14 @@ public class ClientServerFileSenderClass implements Runnable {
 
     }
 
-    void closeConnection(){
-        try {
-            bufferedOutputStream.close();
-            bufferedInputStream.close();
-//            networkHelper.getSocket().close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
+//    void closeConnection(){
+//        try {
+//            bufferedOutputStream.close();
+//            bufferedInputStream.close();
+//
+////            networkHelper.getSocket().close();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//    }
 }

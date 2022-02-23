@@ -1,6 +1,6 @@
 package com.sourav;
 
-import java.io.IOException;
+import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.HashMap;
@@ -20,12 +20,12 @@ public class ServerClass {
                 NetworkHelper networkHelper = new NetworkHelper(socket);
 
                 Object connectedUserName = networkHelper.read();
-                String userName = (String) connectedUserName+clientCount;
+                String userName = (String) connectedUserName + clientCount;
                 System.out.println("Connected User Name : " + connectedUserName);
                 userList.put(userName, networkHelper);
 
-                networkHelper.write(userName+"\n\"List?\" for list of users"+"\n\"Exit\" to exit"+"\n\"To:sender username:your message\" to send message");
-                new ServerThreadClass(userName,networkHelper,userList);
+                networkHelper.write(userName + "\n\"List?\" for list of users" + "\n\"Exit\" to exit" + "\n\"To:sender username:your message\" to send message");
+                new ServerThreadClass(userName, networkHelper, userList);
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -35,15 +35,16 @@ public class ServerClass {
 
 class ServerThreadClass implements Runnable {
     private NetworkHelper networkHelper;
-    HashMap<String,NetworkHelper> userList;
+    HashMap<String, NetworkHelper> userList;
     String currentUser;
     Thread t;
 
-    public ServerThreadClass(String currentUser,NetworkHelper networkHelper,HashMap<String,NetworkHelper> userList) {
+    public ServerThreadClass(String currentUser, NetworkHelper networkHelper, HashMap<String, NetworkHelper> userList) {
         this.networkHelper = networkHelper;
         this.userList = userList;
-        this.currentUser=currentUser;
+        this.currentUser = currentUser;
         t = new Thread(this);
+        t.setName(currentUser);
         t.start();
     }
 
@@ -52,42 +53,74 @@ class ServerThreadClass implements Runnable {
 
 
         while (true) {
+            System.out.println("Waiting for input" + t.getName());
             Object object = networkHelper.read();
             if (object == null) break;
-            if(object.toString().contains("List?")){
+            if (object.toString().contains("List?")) {
 //                hm.toString();
 //                networkHelper.write(userList.toString());
                 String list = "User List : \n";
-                for(String key:userList.keySet()){
-                    list=list+key+"\n";
+                for (String key : userList.keySet()) {
+                    list = list + key + "\n";
                 }
                 networkHelper.write(list);
             }
 
-            if(object.toString().contains("To:")){
+            if (object.toString().contains("To:")) {
                 String[] split = object.toString().split(":");
                 String to = split[1];
                 String message = split[2];
-                userList.get(to).write(currentUser+":"+message);
+                userList.get(to).write(currentUser + ":" + message);
 
             }
-            if(object.toString().contains("Send File:")){
+            if (object.toString().contains("Send File:")) {
                 System.out.println("Send****************************************************Called");
                 String[] split = object.toString().split(":");
-               for(String s:split){
-                   System.out.println(s);
-               }
+                for (String s : split) {
+                    System.out.println(s);
+                }
 
                 String name = split[1];
-             ClientFileReceiveClass receiveClass=   new ClientFileReceiveClass(networkHelper,"E:\\Books\\Books study 3.1\\Distributive System\\Assaignment\\ChatApp\\Files\\Temp\\"+name);
+//             ClientFileReceiveClass receiveClass=   new ClientFileReceiveClass(networkHelper,"E:\\Books\\Books study 3.1\\Distributive System\\Assaignment\\ChatApp\\Files\\Temp\\"+name);
+//receiveClass.run();
+                try {
+                    InputStream inputStream = networkHelper.socket.getInputStream();
+                    BufferedInputStream bufferedInputStream = new BufferedInputStream(inputStream);
 
-                networkHelper.write("File Received at Server");
+                    File file = new File("E:\\Books\\Books study 3.1\\Distributive System\\Assaignment\\ChatApp\\Files\\Temp\\" + name);
+                    BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(new FileOutputStream(file));
+                    byte[] buffer = new byte[1024];
+                    int size = (int) networkHelper.read();
+                    int readd = 0;
+                    int bytesRead = 0;
+                    System.out.println("Size : " + size);
+                    while ((bytesRead = bufferedInputStream.read(buffer)) != -1) {
+                        readd += bytesRead;
+//                        if (readd>size) {break;}
+                        System.out.println("Read : " + readd);
+
+                        System.out.println("Bytes Read : " + bytesRead);
+                        bufferedOutputStream.write(buffer, 0, bytesRead);
+                        bufferedOutputStream.flush();
+                        if (readd >= size) {
+                            break;
+                        }
+                    }
+                    System.out.println(bytesRead);
+
+
+                    System.out.println("File Received");
+
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+//                networkHelper.write("File Received at Server");
 
                 System.out.println("Done");
 
 
             }
-
 
 
         }
