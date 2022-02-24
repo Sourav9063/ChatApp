@@ -1,8 +1,6 @@
 package com.sourav;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.*;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.Scanner;
@@ -45,7 +43,62 @@ class ReaderThread implements Runnable {
                 Object returnMsg = networkHelper.ois.readObject();
                 if (returnMsg == null)
                     break;
-                System.out.println("Server response:\n" + returnMsg);
+                System.out.println("Server response:" + returnMsg);
+                if(returnMsg.toString().contains("Send File:")){
+                    Scanner scanner = new Scanner(System.in);
+                    String[] split = returnMsg.toString().split(":");
+                    String fileName = split[2];
+                    String sender = split[1];
+
+                    System.out.println("Do you want to receive file? (y/n)");
+
+                    String yn = scanner.nextLine();
+                    System.out.println("You entered: " + yn);
+                    if(yn.equals("y")) {
+
+                        System.out.println("Input download location: ");
+                        String downloadLocation = scanner.nextLine();
+
+                        networkHelper.write("download:"+sender+":"+fileName);
+
+                        try {
+                            InputStream inputStream = networkHelper.socket.getInputStream();
+                            BufferedInputStream bufferedInputStream = new BufferedInputStream(inputStream);
+
+                            File file = new File(downloadLocation + fileName);
+                            System.out.println(file.getPath());
+                            BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(new FileOutputStream(file));
+                            byte[] buffer = new byte[1024];
+                            int size = (int) networkHelper.read();
+                            int readd = 0;
+                            int bytesRead = 0;
+                            System.out.println("Size : " + size);
+                            while ((bytesRead = bufferedInputStream.read(buffer)) != -1) {
+                                readd += bytesRead;
+                                System.out.println("Read : " + readd);
+                                System.out.println("Bytes Read : " + bytesRead);
+                                bufferedOutputStream.write(buffer, 0, bytesRead);
+                                bufferedOutputStream.flush();
+                                if (readd >= size) {
+                                    break;
+                                }
+                            }
+                            System.out.println(bytesRead);
+                            System.out.println("File Received");
+
+
+                        } catch (FileNotFoundException e) {
+                            e.printStackTrace();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    else{
+                        networkHelper.write("n");
+
+                    }
+
+                }
 
             } catch (IOException e) {
 
@@ -84,9 +137,9 @@ class WriterThread implements Runnable {
 
                 System.out.println("Send To?");
                 String sendTo = scanner.nextLine();
-
+                networkHelper.write("Send File:"+fileName+":"+sendTo);
                 new ClientServerFileSenderClass(networkHelper,location);
-                networkHelper.write("Send File:"+fileName);
+
 
             }
             else {

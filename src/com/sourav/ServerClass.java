@@ -24,7 +24,7 @@ public class ServerClass {
                 System.out.println("Connected User Name : " + connectedUserName);
                 userList.put(userName, networkHelper);
 
-                networkHelper.write(userName + "\n\"List?\" for list of users" + "\n\"Exit\" to exit" + "\n\"To:sender username:your message\" to send message");
+                networkHelper.write(userName + "\n\"List?\" for list of users" + "\n\"Exit\" to exit" + "\n\"To:sender username:your message\" to send message\n \"Send File:\" to send file.");
                 new ServerThreadClass(userName, networkHelper, userList);
             }
         } catch (IOException e) {
@@ -56,6 +56,15 @@ class ServerThreadClass implements Runnable {
             System.out.println("Waiting for input" + t.getName());
             Object object = networkHelper.read();
             if (object == null) break;
+            if(object.toString().contains("download:")){
+                String[] st = object.toString().split(":");
+
+                for (String s : st) {
+                    System.out.println(s);
+                }
+                new ClientServerFileSenderClass(networkHelper,"E:\\Books\\Books study 3.1\\Distributive System\\Assaignment\\ChatApp\\Files\\Temp\\" + st[2]);
+            }
+
             if (object.toString().contains("List?")) {
 //                hm.toString();
 //                networkHelper.write(userList.toString());
@@ -71,16 +80,17 @@ class ServerThreadClass implements Runnable {
                 String to = split[1];
                 String message = split[2];
                 userList.get(to).write(currentUser + ":" + message);
-
+                networkHelper.write("Message Sent");
             }
             if (object.toString().contains("Send File:")) {
-                System.out.println("Send****************************************************Called");
+
                 String[] split = object.toString().split(":");
                 for (String s : split) {
                     System.out.println(s);
                 }
 
                 String name = split[1];
+                String to   =split[2];
 //             ClientFileReceiveClass receiveClass=   new ClientFileReceiveClass(networkHelper,"E:\\Books\\Books study 3.1\\Distributive System\\Assaignment\\ChatApp\\Files\\Temp\\"+name);
 //receiveClass.run();
                 try {
@@ -110,6 +120,12 @@ class ServerThreadClass implements Runnable {
 
 
                     System.out.println("File Received");
+                    networkHelper.write("File Sent Successfully");
+                    userList.get(to).write("File Received From : " + currentUser + " : " + name);
+                    userList.get(to).write("Send File:"+currentUser+":"+name);
+
+
+
 
 
                 } catch (IOException e) {
