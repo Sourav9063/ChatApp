@@ -5,11 +5,12 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.HashMap;
 import java.util.Scanner;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class ServerClass {
     public static void main(String[] args) {
-        HashMap<String, NetworkHelper> userList = new HashMap<>();
-        try {
+
+        try { ConcurrentHashMap<String, NetworkHelper> userList = new ConcurrentHashMap<>();
             ServerSocket serverSocket = new ServerSocket(1234);
             System.out.println("Server Started");
             System.out.println("\"To:\" to send message");
@@ -39,11 +40,11 @@ public class ServerClass {
 
 class ServerThreadClass implements Runnable {
     private NetworkHelper networkHelper;
-    HashMap<String, NetworkHelper> userList;
+    ConcurrentHashMap<String, NetworkHelper> userList;
     String currentUser;
     Thread t;
 
-    public ServerThreadClass(String currentUser, NetworkHelper networkHelper, HashMap<String, NetworkHelper> userList) {
+    public ServerThreadClass(String currentUser, NetworkHelper networkHelper, ConcurrentHashMap<String, NetworkHelper> userList) {
         this.networkHelper = networkHelper;
         this.userList = userList;
         this.currentUser = currentUser;
@@ -154,10 +155,10 @@ class ServerThreadClass implements Runnable {
 }
 class ServerWriter implements Runnable{
 
-   final HashMap<String, NetworkHelper> userList;
+   final ConcurrentHashMap<String, NetworkHelper> userList;
 
     Thread t;
-    ServerWriter( HashMap<String, NetworkHelper> userList){
+    ServerWriter( ConcurrentHashMap<String, NetworkHelper> userList){
 
 
         this.userList = userList;
@@ -178,7 +179,10 @@ class ServerWriter implements Runnable{
                 String to = scanner.nextLine();
                 System.out.println("Input message:");
                 String message = scanner.nextLine();
-                userList.get(to).write("Server message to "+to+":"+message);
+            NetworkHelper networkHelper=    userList.get(to);
+            if(networkHelper!=null){
+                networkHelper.write("Server message to "+to+":"+message);
+            }
             }
             System.out.println("Message sent");
         }
