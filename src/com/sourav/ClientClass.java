@@ -155,3 +155,20 @@ class WriterThread implements Runnable {
 //        scanner.close();
     }
 }
+//class  ConsoleInput{
+//    private Scanner scanner;
+//    private static ConsoleInput consoleInput=null;
+//    private ConsoleInput(){
+//        scanner=new Scanner(System.in);
+//    }
+//    public static ConsoleInput getInstance(){
+//        if(consoleInput==null){
+//            consoleInput=new ConsoleInput();
+//        }
+//        return consoleInput;
+//    }
+//    public synchronized String consoleInput(){
+//        return scanner.nextLine();
+//    }
+//}
+//

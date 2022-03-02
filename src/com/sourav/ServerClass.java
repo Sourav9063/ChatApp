@@ -4,6 +4,7 @@ import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.HashMap;
+import java.util.Scanner;
 
 public class ServerClass {
     public static void main(String[] args) {
@@ -11,7 +12,9 @@ public class ServerClass {
         try {
             ServerSocket serverSocket = new ServerSocket(1234);
             System.out.println("Server Started");
+            System.out.println("\"To:\" to send message");
             int clientCount = 0;
+            new ServerWriter(userList);
             while (true) {
                 Socket socket = serverSocket.accept();
 
@@ -26,6 +29,7 @@ public class ServerClass {
 
                 networkHelper.write(userName + "\n\"List?\" for list of users" + "\n\"Exit\" to exit" + "\n\"To:sender username:your message\" to send message\n \"Send File:\" to send file.");
                 new ServerThreadClass(userName, networkHelper, userList);
+
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -147,4 +151,37 @@ class ServerThreadClass implements Runnable {
         }
     }
 
+}
+class ServerWriter implements Runnable{
+
+   final HashMap<String, NetworkHelper> userList;
+
+    Thread t;
+    ServerWriter( HashMap<String, NetworkHelper> userList){
+
+
+        this.userList = userList;
+
+        t=new Thread(this);
+        t.start();
+    }
+
+    @Override
+    public void run() {
+
+        Scanner scanner =new Scanner(System.in);
+        System.out.println("Server  Writer thread Started");
+        while (true){
+            String input= scanner.nextLine();
+            if(input.contains("To:")){
+                System.out.println("Input user name:");
+                String to = scanner.nextLine();
+                System.out.println("Input message:");
+                String message = scanner.nextLine();
+                userList.get(to).write("Server message to "+to+":"+message);
+            }
+            System.out.println("Message sent");
+        }
+
+    }
 }
